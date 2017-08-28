@@ -145,7 +145,7 @@ def perform_migrate_issues(args):
     gitlab_users_index = gitlab_instance.get_users_index()
     redmine_users_index = redmine_project.get_users_index()
     milestones_index = gitlab_project.get_milestones_index()
-    
+
     log.debug('GitLab milestones are: {}'.format(', '.join(milestones_index) + ' '))
 
     checks = [
@@ -236,7 +236,7 @@ def perform_migrate_iid(args):
         sql_cmd1 = sql.UPDATE_IID_ISSUES.format(
             regex=regex_saved_iid, project_id=gitlab_project_id)
         out1 = sql.run_query(sql_cmd1)
-  
+
         sql_cmd2 = sql.MIGRATE_IID_ISSUES.format(
             regex=regex_saved_iid, project_id=gitlab_project_id)
         out2 = sql.run_query(sql_cmd2)
