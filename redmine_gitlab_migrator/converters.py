@@ -27,7 +27,7 @@ def convert_attachment(redmine_issue_attachment, redmine_api_key):
     }
 
     return uploads
-    
+
 
 def convert_notes(redmine_issue_journals, redmine_user_index, gitlab_user_index):
     """ Convert a list of redmine journal entries to gitlab notes
@@ -78,7 +78,7 @@ def relations_to_string(relations, children, parent_id, issue_id):
         l.append('  * {} #{}'.format(i['relation_type'], other_issue_id))
 
     for i in children:
-        id = i['id']        
+        id = i['id']
         l.append('  * {} #{}'.format('child', id))
 
     if parent_id > 0:
@@ -117,7 +117,7 @@ def custom_fields_to_string(custom_fields, custom_fields_include):
     l = []
     for i in custom_fields:
         name = i['name']
-        
+
         if name in custom_fields_include and i.get('value'):
             # Name: Value
             l.append('  * {}: {}'.format(name, i['value']))
@@ -128,7 +128,7 @@ def custom_fields_to_string(custom_fields, custom_fields_include):
 
 def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_user_index,
                   gitlab_milestones_index, closed_states, custom_fields_include):
-   
+
     issue_state = redmine_issue['status']['name']
 
     if redmine_issue.get('closed_on', None):
@@ -167,7 +167,7 @@ def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_use
         labels.append(redmine_issue['category']['name'])
 
     attachments = redmine_issue.get('attachments', [])
-  
+
     data = {
         'title': '-RM-{}-MR-{}'.format(
             redmine_issue['id'], redmine_issue['subject']),
@@ -209,8 +209,8 @@ def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_use
     assigned_to = redmine_issue.get('assigned_to', None)
     if assigned_to is not None:
         try:
-            data['assignee_id'] = redmine_uid_to_gitlab_user(
-                assigned_to['id'], redmine_user_index, gitlab_user_index)['id']
+            data['assignee_ids'] = list(redmine_uid_to_gitlab_user(
+                assigned_to['id'], redmine_user_index, gitlab_user_index)['id'])
         except KeyError:
             log.warning(
                 'Redmine issue #{} assignee is anonymous. gitlab assinee is attributed '
