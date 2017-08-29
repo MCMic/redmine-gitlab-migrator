@@ -45,7 +45,7 @@ def convert_notes(redmine_issue_journals, redmine_user_index, gitlab_user_index)
         journal_notes = entry.get('notes', '')
         for detail in entry['details']:
             if (detail['property'] == 'attr') and (detail['name'] == 'estimated_hours'):
-                journal_notes = '{}\n/spend {}h'.format(journal_notes, detail['new_value'] - detail.get('old_value', 0))
+                journal_notes = '{}\n/spend {}h'.format(journal_notes, float(detail['new_value']) - float(detail.get('old_value', 0)))
             if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] != '100') and (detail['new_value'] == '100'):
                 journal_notes = '{}\n/close'.format(journal_notes)
             if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] == '100') and (detail['new_value'] != '100'):
