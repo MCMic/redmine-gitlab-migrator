@@ -175,6 +175,13 @@ class GitlabProject(Project):
             self.api.put(milestone_url, data=altered_milestone)
         return milestone
 
+    def set_user_admin(self, userid, admin):
+        """ Set a user as admin or not
+        """
+        users_url = '{}/users'.format(self.instance_url)
+        user_url = '{}/{}'.format(users_url, userid)
+        return self.api.put(user_url, {'admin': admin})
+
     def get_issues(self):
         return self.api.get('{}/issues'.format(self.api_url))
 

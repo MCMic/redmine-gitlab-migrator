@@ -45,6 +45,10 @@ def parse_args():
         'iid', help=perform_migrate_iid.__doc__)
     parser_iid.set_defaults(func=perform_migrate_iid)
 
+    parser_issues = subparsers.add_parser(
+        'alladmins', help=perform_users_admin.__doc__)
+    parser_issues.set_defaults(func=perform_users_admin)
+
     for i in (parser_issues, parser_roadmap, parser_redirect):
         i.add_argument('redmine_project_url')
         i.add_argument(
@@ -278,6 +282,21 @@ def perform_migrate_roadmap(args):
         else:
             created = gitlab_project.create_milestone(data, meta)
             log.info("Version {}".format(created['title']))
+
+
+def perform_users_admin(args):
+    gitlab = GitlabClient(args.gitlab_key, args.no_verify)
+
+    gitlab_project = GitlabProject(args.gitlab_project_url, gitlab)
+
+    users = gitlab_project.get_instance().get_all_users()
+
+    for user in users:
+        if args.check:
+            log.info("Would set user {} admin".format(user['name']))
+        else:
+            admin = gitlab_project.set_user_admin(user['id'], True)
+            log.info("Set user {} as admin: {}".format(user['name'], admin))
 
 def perform_redirect(args):
     redmine = RedmineClient(args.redmine_key, args.no_verify)
