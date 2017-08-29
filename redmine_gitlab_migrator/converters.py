@@ -45,11 +45,14 @@ def convert_notes(redmine_issue_journals, redmine_user_index, gitlab_user_index)
         journal_notes = entry.get('notes', '')
         for detail in entry['details']:
             if (detail['property'] == 'attr') and (detail['name'] == 'estimated_hours'):
-                journal_notes = '{}\n/spend {}h'.format(journal_notes, float(detail['new_value']) - float(detail.get('old_value', 0)))
+                if (float(detail.get('new_value', 0)) == 0):
+                    journal_notes = '{}\n*Remove time spent*\n/remove_time_spent'.format(journal_notes)
+                else:
+                    journal_notes = '{}\n*Set time spent*\n/spend {}h'.format(journal_notes, float(detail['new_value']) - float(detail.get('old_value', 0)))
             if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] != '100') and (detail['new_value'] == '100'):
-                journal_notes = '{}\n/close'.format(journal_notes)
+                journal_notes = '{}\n*Close issue*\n/close'.format(journal_notes)
             if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] == '100') and (detail['new_value'] != '100'):
-                journal_notes = '{}\n/reopen'.format(journal_notes)
+                journal_notes = '{}\n*Reopen issue*\n/reopen'.format(journal_notes)
 
         if len(journal_notes) > 0:
             body = "{}\n\n*(from redmine: written on {})*".format(
