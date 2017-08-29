@@ -43,6 +43,14 @@ def convert_notes(redmine_issue_journals, redmine_user_index, gitlab_user_index)
 
     for entry in redmine_issue_journals:
         journal_notes = entry.get('notes', '')
+        for detail in entry['details']:
+            if (detail['property'] == 'attr') and (detail['name'] == 'estimated_hours'):
+                journal_notes = '{}\n/spend {}h'.format(journal_notes, detail['new_value'] - detail.get('old_value', 0))
+            if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] != '100') and (detail['new_value'] == '100'):
+                journal_notes = '{}\n/close'.format(journal_notes)
+            if (detail['property'] == 'attr') and (detail['name'] == 'done_ratio') and (detail['old_value'] == '100') and (detail['new_value'] != '100'):
+                journal_notes = '{}\n/reopen'.format(journal_notes)
+
         if len(journal_notes) > 0:
             body = "{}\n\n*(from redmine: written on {})*".format(
                 journal_notes, entry['created_on'][:10])
@@ -165,6 +173,8 @@ def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_use
     labels = [redmine_issue['tracker']['name']]
     if (redmine_issue.get('category')):
         labels.append(redmine_issue['category']['name'])
+    if (redmine_issue['status']['name'] != 'Closed'):
+        labels.append(redmine_issue['status']['name'])
 
     attachments = redmine_issue.get('attachments', [])
 
