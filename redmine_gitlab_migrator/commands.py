@@ -45,9 +45,9 @@ def parse_args():
         'iid', help=perform_migrate_iid.__doc__)
     parser_iid.set_defaults(func=perform_migrate_iid)
 
-    parser_issues = subparsers.add_parser(
+    parser_alladmins = subparsers.add_parser(
         'alladmins', help=perform_users_admin.__doc__)
-    parser_issues.set_defaults(func=perform_users_admin)
+    parser_alladmins.set_defaults(func=perform_users_admin)
 
     for i in (parser_issues, parser_roadmap, parser_redirect):
         i.add_argument('redmine_project_url')
@@ -56,7 +56,7 @@ def parse_args():
             required=True,
             help="Redmine administrator API key")
 
-    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect):
+    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins):
         i.add_argument('gitlab_project_url')
         i.add_argument(
             '--gitlab-key',
