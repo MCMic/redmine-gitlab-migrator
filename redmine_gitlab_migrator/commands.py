@@ -136,7 +136,16 @@ def perform_migrate_issues(args):
 
     custom_fields = []
     if (args.custom_fields):
-        custom_fields = args.custom_fields.split(',')
+        custom_fields_passed = args.custom_fields.split(',')
+        for cf in custom_fields_passed:
+            cf_parts = cf.rsplit(':', 1)
+            cf_name, cf_tag = cf_parts[0], cf_parts[1:]
+            if (cf_tag == 'label_value'):
+                custom_fields[cf_name] = {'label':'value'}
+            elif (cf_tag == 'label_full'):
+                custom_fields[cf_name] = {'label':'full'}
+            else:
+                custom_fields[cf] = {'label':'none'}
 
     redmine = RedmineClient(args.redmine_key, args.no_verify)
     gitlab = GitlabClient(args.gitlab_key, args.no_verify)

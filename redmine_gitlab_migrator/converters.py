@@ -126,14 +126,19 @@ def custom_fields_to_string(custom_fields, custom_fields_include):
     :return a string listing custom_fileds.
     """
     l = []
+    labels = []
     for i in custom_fields:
         name = i['name']
 
-        if name in custom_fields_include and i.get('value'):
+        if custom_fields_include.get(name) and i.get('value'):
+            if (custom_fields_include[name]['label'] == 'full'):
+                labels.append('{}:{}'.format(name, i['value'])
+            elif (custom_fields_include[name]['label'] == 'value'):
+                labels.append(i['value'])
             # Name: Value
             l.append('  * {}: {}'.format(name, i['value']))
 
-    return "\n".join(l)
+    return labels, "\n".join(l)
 
 # Convertor
 
@@ -169,11 +174,11 @@ def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_use
         changesets_text = "\n* Changesets:\n" + changesets_text
 
     custom_fields = redmine_issue.get('custom_fields', [])
-    custom_fields_text = custom_fields_to_string(custom_fields, custom_fields_include)
+    labels, custom_fields_text = custom_fields_to_string(custom_fields, custom_fields_include)
     if len(custom_fields_text) > 0:
         custom_fields_text = "\n* Custom Fields:\n" + custom_fields_text
 
-    labels = [redmine_issue['tracker']['name']]
+    labels.append(redmine_issue['tracker']['name'])
     if (redmine_issue.get('category')):
         labels.append(redmine_issue['category']['name'])
     if (redmine_issue['status']['name'] != 'Closed'):
