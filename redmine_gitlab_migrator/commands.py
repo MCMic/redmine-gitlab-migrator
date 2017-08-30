@@ -134,7 +134,7 @@ def perform_migrate_issues(args):
     if (args.closed_states):
         closed_states = args.closed_states.split(',')
 
-    custom_fields = []
+    custom_fields = {}
     if (args.custom_fields):
         custom_fields_passed = args.custom_fields.split(',')
         for cf in custom_fields_passed:
