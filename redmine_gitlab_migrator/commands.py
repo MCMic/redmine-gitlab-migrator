@@ -138,8 +138,7 @@ def perform_migrate_issues(args):
     if (args.custom_fields):
         custom_fields_passed = args.custom_fields.split(',')
         for cf in custom_fields_passed:
-            cf_parts = cf.rsplit(':', 1)
-            cf_name, cf_tag = cf_parts[0], cf_parts[1:]
+            cf_name, cf_tag = (cf.rsplit(':', 1) + [None])[:2]
             if (cf_tag == 'label_value'):
                 custom_fields[cf_name] = {'label':'value'}
             elif (cf_tag == 'label_full'):
