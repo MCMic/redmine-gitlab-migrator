@@ -60,7 +60,7 @@ def parse_args():
             required=True,
             help="Redmine administrator API key")
 
-    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins, parser_userdates):
+    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins):
         i.add_argument('gitlab_project_url')
         i.add_argument(
             '--gitlab-key',
@@ -315,10 +315,6 @@ def perform_users_fix_creation_date(args):
     redmine = RedmineClient(args.redmine_key, args.no_verify)
     redmine_project = RedmineProject(args.redmine_project_url, redmine)
 
-    gitlab = GitlabClient(args.gitlab_key, args.no_verify)
-    gitlab_project = GitlabProject(args.gitlab_project_url, gitlab)
-    gitlab_project_id = gitlab_project.get_id()
-
     # get users
     users = redmine_project.get_participants()
 
@@ -328,7 +324,6 @@ def perform_users_fix_creation_date(args):
         else:
             log.info("Set user {} creation date to {}".format(user['login'], user['created_on']))
             sql_cmd = sql.SET_USER_CREATION_DATE.format(
-                project_id=gitlab_project_id,
                 login=user['login'], 
                 date=re.sub('T', ' ', user['created_on']))
             out = sql.run_query(sql_cmd)
