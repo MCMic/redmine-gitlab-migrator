@@ -330,7 +330,7 @@ def perform_users_fix_creation_date(args):
             sql_cmd = sql.SET_USER_CREATION_DATE.format(
                 project_id=gitlab_project_id,
                 login=user['login'], 
-                date=user['created_on'])
+                date=re.sub('T', ' ', user['created_on']))
             out = sql.run_query(sql_cmd)
 
             try:
@@ -338,7 +338,7 @@ def perform_users_fix_creation_date(args):
                 migrated_count = int(m.group(1))
                 log.info('Successfully set date for {} user'.format(migrated_count))
             except (IndexError, AttributeError):
-                raise ValueError('Invalid output from postgres command: "{}"'.format(output))
+                raise ValueError('Invalid output from postgres command: "{}"'.format(out))
 
 def perform_redirect(args):
     redmine = RedmineClient(args.redmine_key, args.no_verify)
