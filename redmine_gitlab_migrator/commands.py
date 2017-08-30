@@ -329,7 +329,7 @@ def perform_users_fix_creation_date(args):
             out = sql.run_query(sql_cmd)
 
             try:
-                m = re.match(r'\s*(\d+)\s*', out, re.DOTALL | re.MULTILINE)
+                m = re.match(r'\s*UPDATE (\d+)\s*', out, re.DOTALL | re.MULTILINE)
                 migrated_count = int(m.group(1))
                 log.info('Successfully set date for {} user'.format(migrated_count))
             except (IndexError, AttributeError):
