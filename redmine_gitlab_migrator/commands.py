@@ -49,7 +49,11 @@ def parse_args():
         'alladmins', help=perform_users_admin.__doc__)
     parser_alladmins.set_defaults(func=perform_users_admin)
 
-    for i in (parser_issues, parser_roadmap, parser_redirect):
+    parser_userdates = subparsers.add_parser(
+        'userdates', help=perform_users_fix_creation_date.__doc__)
+    parser_userdates.set_defaults(func=perform_users_fix_creation_date)
+
+    for i in (parser_issues, parser_roadmap, parser_redirect, parser_userdates):
         i.add_argument('redmine_project_url')
         i.add_argument(
             '--redmine-key',
@@ -305,6 +309,32 @@ def perform_users_admin(args):
         else:
             admin = gitlab_project.set_user_admin(user['id'], True)
             log.info("Set user {} as admin: {}".format(user['name'], admin))
+
+
+def perform_users_fix_creation_date(args):
+    redmine = RedmineClient(args.redmine_key, args.no_verify)
+    redmine_project = RedmineProject(args.redmine_project_url, redmine)
+
+    # get users
+    users = redmine_project.get_participants()
+
+    for user in users:
+        if args.check:
+            log.info("Would set user {} creation date to {}".format(user['login'], user['created_on']))
+        else:
+            log.info("Set user {} creation date to {}".format(user['login'], user['created_on']))
+            sql_cmd = sql.SET_USER_CREATION_DATE.format(
+                project_id=gitlab_project_id,
+                login=user['login'], 
+                date=user['created_on'])
+            out = sql.run_query(sql_cmd)
+
+            try:
+                m = re.match(r'\s*(\d+)\s*', out, re.DOTALL | re.MULTILINE)
+                migrated_count = int(m.group(1))
+                log.info('Successfully set date for {} user'.format(migrated_count))
+            except (IndexError, AttributeError):
+                raise ValueError('Invalid output from postgres command: "{}"'.format(output))
 
 def perform_redirect(args):
     redmine = RedmineClient(args.redmine_key, args.no_verify)
