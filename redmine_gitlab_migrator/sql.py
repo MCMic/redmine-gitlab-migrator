@@ -29,7 +29,7 @@ WHERE title ~* '{regex}' AND project_id={project_id};
 
 SET_USER_CREATION_DATE = r"""
 UPDATE users SET
-  created_at = '{date}',
+  created_at = '{date}'
 WHERE username='{login}' AND project_id='{project_id}';
 """
 
