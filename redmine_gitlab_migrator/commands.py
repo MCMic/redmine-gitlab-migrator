@@ -60,7 +60,7 @@ def parse_args():
             required=True,
             help="Redmine administrator API key")
 
-    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins):
+    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins, parser_userdates):
         i.add_argument('gitlab_project_url')
         i.add_argument(
             '--gitlab-key',
