@@ -132,7 +132,7 @@ def custom_fields_to_string(custom_fields, custom_fields_include):
 
         if custom_fields_include.get(name) and i.get('value'):
             if (custom_fields_include[name]['label'] == 'full'):
-                labels.append('{}:{}'.format(name, i['value'])
+                labels.append('{}:{}'.format(name, i['value']))
             elif (custom_fields_include[name]['label'] == 'value'):
                 labels.append(i['value'])
             # Name: Value
