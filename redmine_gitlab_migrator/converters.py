@@ -187,8 +187,7 @@ def convert_issue(redmine_api_key, redmine_issue, redmine_user_index, gitlab_use
     attachments = redmine_issue.get('attachments', [])
 
     data = {
-        'title': '-RM-{}-MR-{}'.format(
-            redmine_issue['id'], redmine_issue['subject']),
+        'title': '-RM-{}-MR-{}'.format(redmine_issue['id'], redmine_issue['subject'])[:255],
         'description': '{}\n\n*(from redmine: issue id {}, created on {}{})*\n{}{}{}'.format(
             redmine_issue['description'],
             redmine_issue['id'],
