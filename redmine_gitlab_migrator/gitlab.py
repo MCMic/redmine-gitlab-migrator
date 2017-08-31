@@ -139,7 +139,7 @@ class GitlabProject(Project):
         except:
             log.error('Creating issue "{}" failed'.format(data['title']))
             print ("Failed issue:", data)
-            raise CommandError('Creating issue "{}" failed'.format(data['title']))
+            raise Exception('Creating issue "{}" failed'.format(data['title']))
 
         issue_url = '{}/{}'.format(issues_url, issue['iid'])
 
@@ -177,6 +177,7 @@ class GitlabProject(Project):
                 milestone = self.api.post(milestones_url, data=data)
             except:
                 print("Failed to create milestone:", data)
+                raise Exception('Creating milestone "{}" failed'.format(data['title']))
 
         if (meta['must_close'] and milestone['state'] != 'closed'):
             milestone_url = '{}/{}'.format(milestones_url, milestone['id'])
