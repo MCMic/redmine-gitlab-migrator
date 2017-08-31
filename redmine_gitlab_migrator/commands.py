@@ -49,6 +49,10 @@ def parse_args():
         'alladmins', help=perform_users_admin.__doc__)
     parser_alladmins.set_defaults(func=perform_users_admin)
 
+    parser_noadmins = subparsers.add_parser(
+        'noadmins', help=perform_users_remove_admin.__doc__)
+    parser_noadmins.set_defaults(func=perform_users_remove_admin)
+
     parser_userdates = subparsers.add_parser(
         'userdates', help=perform_users_fix_creation_date.__doc__)
     parser_userdates.set_defaults(func=perform_users_fix_creation_date)
@@ -60,7 +64,7 @@ def parse_args():
             required=True,
             help="Redmine administrator API key")
 
-    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins, parser_userdates):
+    for i in (parser_issues, parser_roadmap, parser_iid, parser_redirect, parser_alladmins, parser_noadmins, parser_userdates):
         i.add_argument('gitlab_project_url')
         i.add_argument(
             '--gitlab-key',
@@ -81,6 +85,8 @@ def parse_args():
             '--no-verify',
             required=False, action='store_false', default=True,
             help="disable SSL certificate verification")
+    
+    parser_noadmins.add_argument('admin_user')
 
     parser_issues.add_argument(
         '--closed-states',
@@ -310,6 +316,22 @@ def perform_users_admin(args):
             admin = gitlab_project.set_user_admin(user['id'], True)
             log.info("Set user {} as admin: {}".format(user['name'], admin))
 
+
+def perform_users_remove_admin(args):
+    gitlab = GitlabClient(args.gitlab_key, args.no_verify)
+
+    gitlab_project = GitlabProject(args.gitlab_project_url, gitlab)
+
+    users = gitlab_project.get_instance().get_all_users()
+
+    for user in users:
+        if (user['username'] == args.admin_user):
+            log.info("Skipping admin user {}".format(user['username']))
+        elif args.check:
+            log.info("Would remove admin rights to user {}".format(user['username']))
+        else:
+            admin = gitlab_project.set_user_admin(user['id'], False)
+            log.info("Remove admin rights to user {}".format(user['username']))
 
 def perform_users_fix_creation_date(args):
     redmine = RedmineClient(args.redmine_key, args.no_verify)
