@@ -134,17 +134,25 @@ class GitlabProject(Project):
            data['description'] = "{}\n* Uploads:\n  * {}".format(data['description'], uploads_text)
 
         issues_url = '{}/issues'.format(self.api_url)
-        issue = self.api.post(
-            issues_url, data=data, headers={'SUDO': meta['sudo_user']})
+        try:
+            issue = self.api.post(issues_url, data=data, headers={'SUDO': meta['sudo_user']})
+        except:
+            log.error('Creating issue "{}" failed'.format(data['title']))
+            print "Failed issue:", data
+            raise CommandError('Creating issue "{}" failed'.format(data['title']))
 
         issue_url = '{}/{}'.format(issues_url, issue['iid'])
 
         # Handle issues notes
         issue_notes_url = '{}/notes'.format(issue_url, 'notes')
         for note_data, note_meta in meta['notes']:
-            self.api.post(
-                issue_notes_url, data=note_data,
-                headers={'SUDO': note_meta['sudo_user']})
+            try:
+                self.api.post(
+                    issue_notes_url, data=note_data,
+                    headers={'SUDO': note_meta['sudo_user']})
+            except:
+                log.error('Adding note for issue "{}" failed'.format(issue['title']))
+                print "Failed note:", note_data
 
         # Handle closed status
         if meta['must_close']:
