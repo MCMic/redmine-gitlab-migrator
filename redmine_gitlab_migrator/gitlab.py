@@ -138,7 +138,7 @@ class GitlabProject(Project):
             issue = self.api.post(issues_url, data=data, headers={'SUDO': meta['sudo_user']})
         except:
             log.error('Creating issue "{}" failed'.format(data['title']))
-            print "Failed issue:", data
+            print ("Failed issue:", data)
             raise CommandError('Creating issue "{}" failed'.format(data['title']))
 
         issue_url = '{}/{}'.format(issues_url, issue['iid'])
@@ -152,7 +152,7 @@ class GitlabProject(Project):
                     headers={'SUDO': note_meta['sudo_user']})
             except:
                 log.error('Adding note for issue "{}" failed'.format(issue['title']))
-                print "Failed note:", note_data
+                print ("Failed note:", note_data)
 
         # Handle closed status
         if meta['must_close']:
@@ -180,7 +180,10 @@ class GitlabProject(Project):
             altered_milestone = milestone.copy()
             altered_milestone['state_event'] = 'close'
 
-            self.api.put(milestone_url, data=altered_milestone)
+            try:
+                self.api.put(milestone_url, data=altered_milestone)
+            except:
+                print("Failed to create milestone:", altered_milestone)
         return milestone
 
     def set_user_admin(self, userid, admin):
