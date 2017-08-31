@@ -173,7 +173,10 @@ class GitlabProject(Project):
         try:
             milestone = self.get_milestone_by_title(data['title'])
         except ValueError:
-            milestone = self.api.post(milestones_url, data=data)
+            try:
+                milestone = self.api.post(milestones_url, data=data)
+            except:
+                print("Failed to create milestone:", data)
 
         if (meta['must_close'] and milestone['state'] != 'closed'):
             milestone_url = '{}/{}'.format(milestones_url, milestone['id'])
@@ -183,7 +186,7 @@ class GitlabProject(Project):
             try:
                 self.api.put(milestone_url, data=altered_milestone)
             except:
-                print("Failed to create milestone:", altered_milestone)
+                print("Failed to close milestone:", altered_milestone)
         return milestone
 
     def set_user_admin(self, userid, admin):
